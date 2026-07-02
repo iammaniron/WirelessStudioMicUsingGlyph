@@ -4,7 +4,7 @@ The ₹2,000 Studio Mic
 Where This Came From
 ---
 
-A few weeks ago, we were filming some content for PCB Cupid's YouTube channel. We had this tiny wireless microphone clipped onto the presenter's collar — one of those expensive ones that every creator swears by. You know the kind. Costs somewhere north of fifteen thousand rupees. Sounds great. Pairs instantly. The whole crew loves it.
+A few weeks ago, we were filming some content for PCB Cupid's YouTube channel. We had this tiny wireless microphone clipped onto the presenter's collar, one of those expensive ones that every creator swears by. You know the kind. Costs somewhere north of fifteen thousand rupees. Sounds great. Pairs instantly. The whole crew loves it.
 
 And then someone said the obvious thing out loud.
 
@@ -23,7 +23,7 @@ Here's the thing about building hardware in India. You're always fighting the pe
 
 But we started doing the math.
 
-That wireless setup costs fifteen grand and does exactly one thing. Meanwhile, we've got a stereo mic module for five hundred bucks, a Glyph S3 with a built-in battery charger for seven hundred, an SD card breakout for ninety-nine, an OLED display, an audio amplifier — all sitting in our own inventory. Every piece of it open source. Every line of code yours to change.
+That wireless setup costs fifteen grand and does exactly one thing. Meanwhile, we've got a stereo mic module for five hundred bucks, a Glyph S3 with a built-in battery charger for seven hundred, an SD card breakout for ninety-nine, an OLED display, an audio amplifier. All sitting in our own inventory. Every piece of it open source. Every line of code yours to change.
 
 Now look, I'm not going to pretend a ₹499 MEMS microphone is going to beat a studio condenser. It won't. The physics of a microscopic silicon diaphragm are what they are. The noise floor is higher. The bass rolls off at 60 Hz. If you're recording a platinum album, buy the Neumann.
 
@@ -36,9 +36,9 @@ What We're Actually Building
 
 A self-contained stereo recording microphone. Portable. Battery powered. All-digital signal path. Made entirely from our own modules.
 
-The heart of it is our 2-channel MEMS microphone module — two matched digital mics on one board, spitting out 24-bit stereo I2S audio. No analog preamp. No ADC noise. No ground loops. Just ones and zeros straight into the Glyph.
+The heart of it is our 2-channel MEMS microphone module. Two matched digital mics on one board, spitting out 24-bit stereo I2S audio. No analog preamp. No ADC noise. No ground loops. Just ones and zeros straight into the Glyph.
 
-The brain is a Glyph S3 — dual-core, 240 MHz, 8 MB of flash, and crucially, a built-in LiPo battery charger. It's got two I2S peripherals, which means we can pull audio in from the mic and push it out to the amplifier at the same time. Real-time monitoring, no lag.
+The brain is a Glyph S3. Dual-core, 240 MHz, 8 MB of flash, and crucially, a built-in LiPo battery charger. It's got two I2S peripherals, which means we can pull audio in from the mic and push it out to the amplifier at the same time. Real-time monitoring, no lag.
 
 Audio gets written as proper WAV files to a microSD card over SPI. A tiny OLED shows recording time, bouncing VU meter bars, battery level. A few buttons for record, stop, playback. An NAU8325 amplifier drives headphones or a small speaker so you can hear yourself while recording.
 
@@ -49,7 +49,7 @@ Why a Kit
 
 We want to sell this as a kit. Not a finished product. A kit.
 
-Someone builds this, they learn I2S audio, SPI storage, I2C displays, RTOS task design, WAV file formats, real-time DSP. Those are real embedded engineering skills. It's a walking catalog of PCB Cupid products working together — Glyph board, G-Sense mic, G-Mod SD card, GLINK accessories.
+Someone builds this, they learn I2S audio, SPI storage, I2C displays, RTOS task design, WAV file formats, real-time DSP. Those are real embedded engineering skills. It's a walking catalog of PCB Cupid products working together. Glyph board, G-Sense mic, G-Mod SD card, GLINK accessories.
 
 But honestly, the bigger reason is simpler. There's something different about recording a podcast on gear you assembled and programmed yourself versus something you unboxed. Content creators love that story. Their audience loves that story.
 
@@ -60,11 +60,11 @@ How It Actually Sounds
 
 I want to be straight about this, because overselling helps nobody.
 
-For close-mic podcast vocals, it works. If you're six to twelve inches from the mic, the signal-to-noise ratio is totally usable. Add a noise gate — either in post, or running right on the Glyph in real time — and the noise floor disappears between words. Voices come through clean. The chest resonance, the warmth that lives around 100 to 200 Hz, it's all there.
+For close-mic podcast vocals, it works. If you're six to twelve inches from the mic, the signal-to-noise ratio is totally usable. Add a noise gate, either in post or running right on the Glyph in real time, and the noise floor disappears between words. Voices come through clean. The chest resonance, the warmth that lives around 100 to 200 Hz, it's all there.
 
-Stereo interviews are where this thing gets interesting. Two mics, two channels, one module. Put it between two people and you get natural stereo separation. That's something even expensive lav mics can't do. Acoustic instruments — guitar, ukulele, violin — the high end is crisp and detailed.
+Stereo interviews are where this thing gets interesting. Two mics, two channels, one module. Put it between two people and you get natural stereo separation. That's something even expensive lav mics can't do. Acoustic instruments, like guitar, ukulele, violin, the high end is crisp and detailed.
 
-Where it struggles: whisper-quiet recordings, ASMR, anything where the sound you're capturing lives close to the noise floor. The self-noise is around 29 dBA, and in a silent room, you'll hear it. Bass-heavy music is also not its strength — the MEMS element starts rolling off at 60 Hz, so kick drums and bass guitars lose their weight. And no, it won't replace a large-diaphragm condenser. A microscopic silicon diaphragm will never move air the way a one-inch membrane does. Physics is stubborn about these things.
+Where it struggles: whisper-quiet recordings, ASMR, anything where the sound you're capturing lives close to the noise floor. The self-noise is around 29 dBA, and in a silent room, you'll hear it. Bass-heavy music is also not its strength. The MEMS element starts rolling off at 60 Hz, so kick drums and bass guitars lose their weight. And no, it won't replace a large-diaphragm condenser. A microscopic silicon diaphragm will never move air the way a one-inch membrane does. Physics is stubborn about these things.
 
 But here's the clever part that makes up for a lot of this. Because the audio is digital from the moment it leaves the mic capsule, and because the Glyph S3 has real DSP muscle, we can do things in software that analog mics need racks of outboard gear for. Noise gating to clean up the silence between words. A touch of EQ to bring out warmth. Compression to even out the levels. Auto gain so you don't clip.
 
@@ -75,7 +75,7 @@ Rough Plan
 
 The recording pipeline is straightforward. Mic to Glyph over I2S. Glyph encodes WAV and writes to SD card. Simultaneously, it passes the audio through to the NAU8325 amplifier for headphone monitoring. An OLED display on I2C shows recording time and VU levels pulled from peak detection on the incoming audio. A handful of GPIO buttons handle record, stop, playback, and mode switching. The whole thing runs on a LiPo, managed by the Glyph S3's built-in charger.
 
-That's the core. Everything else — Wi-Fi streaming, DSP effects, web control panel — those are stretch goals. The foundation is solid on its own.
+That's the core. Everything else, like Wi-Fi streaming, DSP effects, web control panel, those are stretch goals. The foundation is solid on its own.
 
 Kit Parts (All from PCB Cupid)
 ---
