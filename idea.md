@@ -2,11 +2,11 @@
 
 ## Where This Came From
 
-A few weeks ago, we were filming some content for PCB Cupid's YouTube channel. We had this tiny wireless microphone clipped onto the presenter's collar — one of those expensive ones that everyone uses these days. You know the kind. Costs somewhere north of ₹15,000. Sounds great. Pairs instantly. The whole crew loves it.
+A few weeks ago, we were filming some content for PCB Cupid's YouTube channel. We had this tiny wireless microphone clipped onto the presenter's collar — one of those expensive ones that every creator swears by. You know the kind. Costs somewhere north of fifteen thousand rupees. Sounds great. Pairs instantly. The whole crew loves it.
 
-And then someone said the obvious thing out loud:
+And then someone said the obvious thing out loud.
 
-*"Wait. We literally sell a stereo microphone module for ₹499. We have our own ESP32 boards with battery management. We have SD card modules. We have audio amplifiers. Why are we using someone else's mic?"*
+*"Wait. We literally sell a stereo microphone module for ₹499. We have our own Glyph boards with battery management. We have SD card modules. We have audio amplifiers. Why are we using someone else's mic?"*
 
 Silence.
 
@@ -16,122 +16,76 @@ That's how this started. Not with a datasheet. With a question that wouldn't go 
 
 ## The Bet
 
-Here's the thing about building hardware in India: you're always fighting the perception that the expensive imported thing is better. And sometimes it is. That wireless mic we were using? It's genuinely good engineering. No question.
+Here's the thing about building hardware in India. You're always fighting the perception that the expensive imported thing is better. And sometimes it is. That wireless mic we were using is genuinely good engineering. No argument there.
 
-But we started doing the math, and the numbers were kind of ridiculous:
+But we started doing the math.
 
-| What we were using | What we could build |
-|---|---|
-| ₹15,000+ wireless mic | ₹499 stereo MEMS mic module |
-| Proprietary closed system | Open source, hackable, yours |
-| Can't repair, can't modify | Every line of code is yours |
-| One trick pony (just a mic) | ESP32 with Wi-Fi, BLE, DSP, SD card, display... |
-| Dead battery? Buy a new one | Dead battery? Swap in any LiPo |
+That wireless setup costs fifteen grand and does exactly one thing. Meanwhile, we've got a stereo mic module for five hundred bucks, a Glyph S3 with a built-in battery charger for seven hundred, an SD card breakout for ninety-nine, an OLED display, an audio amplifier — all sitting in our own inventory. Every piece of it open source. Every line of code yours to change.
 
-Now, I'm not going to pretend a ₹499 MEMS microphone is going to beat a studio condenser. It won't. The physics of a microscopic silicon diaphragm are what they are. The noise floor is higher. The bass rolls off at 60 Hz. If you're recording a platinum album, buy the Neumann.
+Now look, I'm not going to pretend a ₹499 MEMS microphone is going to beat a studio condenser. It won't. The physics of a microscopic silicon diaphragm are what they are. The noise floor is higher. The bass rolls off at 60 Hz. If you're recording a platinum album, buy the Neumann.
 
-But here's what we *can* do: build something that costs less than the tax on that wireless mic, records clean 24-bit stereo audio to an SD card, shows you a VU meter on an OLED display, lets you monitor through headphones in real time, runs on a battery for hours, and fits in your pocket. And when it breaks or you want to change something, you open the code and fix it yourself.
+But here's what we *can* do: build something that costs less than the GST on that wireless mic, records clean 24-bit stereo audio straight to an SD card, shows you live VU meters on an OLED, lets you monitor through headphones with zero latency, runs on a battery for hours, and fits in your pocket. And when it breaks, or you want to change how it works, you open the code and fix it yourself.
 
 That's a different kind of value. That's the PCB Cupid kind.
 
 ## What We're Actually Building
 
-A self-contained stereo recording microphone. Portable. Battery powered. All-digital signal path. Made entirely from PCB Cupid modules.
+A self-contained stereo recording microphone. Portable. Battery powered. All-digital signal path. Made entirely from our own modules.
 
-The heart of it is our **2-channel MEMS microphone module** — two matched ICS-43434 (or IM69D130) digital mics on one board, spitting out 24-bit stereo I2S audio. No analog preamp. No ADC noise. No ground loops. Just ones and zeros straight into the ESP32.
+The heart of it is our 2-channel MEMS microphone module — two matched digital mics on one board, spitting out 24-bit stereo I2S audio. No analog preamp. No ADC noise. No ground loops. Just ones and zeros straight into the Glyph.
 
-The brain is a **Glyph ESP32-S3** — dual-core 240 MHz, 8 MB of flash, and crucially, a built-in LiPo battery charger. It's got two I2S peripherals, which means we can record from the mic AND send audio to the amplifier at the same time. Real-time monitoring with zero latency.
+The brain is a Glyph S3 — dual-core, 240 MHz, 8 MB of flash, and crucially, a built-in LiPo battery charger. It's got two I2S peripherals, which means we can pull audio in from the mic and push it out to the amplifier at the same time. Real-time monitoring, no lag.
 
-Audio gets written as proper WAV files to a **microSD card** over SPI. A tiny **OLED display** shows you what's happening — recording time, VU meter bars dancing with your voice, battery level. A few **buttons** for record, stop, playback. A **NAU8325 amplifier** drives headphones or a small speaker so you can hear yourself while recording.
+Audio gets written as proper WAV files to a microSD card over SPI. A tiny OLED shows recording time, bouncing VU meter bars, battery level. A few buttons for record, stop, playback. An NAU8325 amplifier drives headphones or a small speaker so you can hear yourself while recording.
 
-All of this goes into a **3D-printed enclosure**. The whole thing, end to end, costs around **₹2,000-2,500** in parts. Every single component is something we already sell on shop.pcbcupid.com.
+All of this goes into a 3D-printed enclosure. The whole thing, end to end, costs around two to two-and-a-half thousand rupees in parts. Every single component is something we already sell on shop.pcbcupid.com.
 
-## The Kit Vision
+## Why a Kit
 
-We want to sell this as a kit. Not a finished product — a kit. Here's why:
+We want to sell this as a kit. Not a finished product. A kit.
 
-1. **Educational value is the whole point.** Someone builds this, they learn I2S audio, SPI storage, I2C displays, RTOS task design, WAV file formats, and real-time DSP. Those are real embedded engineering skills.
+Someone builds this, they learn I2S audio, SPI storage, I2C displays, RTOS task design, WAV file formats, real-time DSP. Those are real embedded engineering skills. It's a walking catalog of PCB Cupid products working together — Glyph board, G-Sense mic, G-Mod SD card, GLINK accessories.
 
-2. **It showcases our entire ecosystem.** Glyph board, G-Sense mic, G-Mod SD card, GLINK I2C accessories — it's a walking catalog of PCB Cupid products working together.
+But honestly, the bigger reason is simpler. There's something different about recording a podcast on gear you assembled and programmed yourself versus something you unboxed. Content creators love that story. Their audience loves that story.
 
-3. **The "I built this" feeling.** There's something different about recording a podcast on gear you assembled and programmed yourself versus something you unboxed. Content creators love that story. Their audience loves that story.
+And it's hackable by design. Want Wi-Fi streaming? The Glyph has it built in. Want a web interface for settings? Go ahead. Want to add DSP effects? The processor can handle it. The kit is a starting point, not a finished product.
 
-4. **It's hackable by design.** Want to add Wi-Fi streaming? The ESP32-S3 has Wi-Fi. Want to add a web interface for settings? Go ahead. Want to add DSP effects? The dual-core processor can handle it. The kit is a starting point, not a finished product.
+## How It Actually Sounds
 
-## The Honest Audio Quality Assessment
+I want to be straight about this, because overselling helps nobody.
 
-I'm going to be straightforward about what this can and can't do, because we don't want to oversell and underdeliver.
+For close-mic podcast vocals, it works. If you're six to twelve inches from the mic, the signal-to-noise ratio is totally usable. Add a noise gate — either in post, or running right on the Glyph in real time — and the noise floor disappears between words. Voices come through clean. The chest resonance, the warmth that lives around 100 to 200 Hz, it's all there.
 
-### What it does well:
+Stereo interviews are where this thing gets interesting. Two mics, two channels, one module. Put it between two people and you get natural stereo separation. That's something even expensive lav mics can't do. Acoustic instruments — guitar, ukulele, violin — the high end is crisp and detailed.
 
-- **Close-mic podcast vocals.** If you're 6-12 inches from the mic, the signal-to-noise ratio is totally usable. Add a noise gate in post (or in real-time on the ESP32) and the noise floor disappears between words.
-- **Stereo interviews.** Two mics, two channels, one module. Put it between two people and you get natural stereo separation. That's something even expensive lav mics can't do.
-- **Acoustic instruments.** Guitar, ukulele, violin — the high end is clean and detailed.
-- **Field recording (moderate to loud environments).** City streets, markets, nature with birds — fine. Quiet forests at night — the self-noise becomes audible.
+Where it struggles: whisper-quiet recordings, ASMR, anything where the sound you're capturing lives close to the noise floor. The self-noise is around 29 dBA, and in a silent room, you'll hear it. Bass-heavy music is also not its strength — the MEMS element starts rolling off at 60 Hz, so kick drums and bass guitars lose their weight. And no, it won't replace a large-diaphragm condenser. A microscopic silicon diaphragm will never move air the way a one-inch membrane does. Physics is stubborn about these things.
 
-### What it doesn't do:
+But here's the clever part that makes up for a lot of this. Because the audio is digital from the moment it leaves the mic capsule, and because the Glyph S3 has real DSP muscle, we can do things in software that analog mics need racks of outboard gear for. Noise gating to clean up the silence between words. A touch of EQ to bring out warmth. Compression to even out the levels. Auto gain so you don't clip.
 
-- **Quiet ASMR or whisper recording.** The self-noise floor of ~29 dBA means you'll hear hiss in very quiet recordings.
-- **Bass-heavy music production.** The MEMS element rolls off at 60 Hz. Kick drums and bass guitars will sound thin.
-- **Replacing a large-diaphragm condenser.** Physics is physics. A microscopic silicon diaphragm will never move air the way a 1-inch gold-sputtered membrane does.
+Applied tastefully, these close a surprising amount of the gap between a MEMS mic and a budget condenser. For podcasting and content creation, they can tip the difference between "sounds like a fun DIY project" and "wait, that actually sounds like a real mic."
 
-### The DSP Advantage
+## Rough Plan
 
-Here's the clever part: because the audio is digital from the moment it leaves the mic capsule, and because the ESP32-S3 has real DSP horsepower, we can do things in software that analog mics need racks of outboard gear for:
+The recording pipeline is straightforward. Mic to Glyph over I2S. Glyph encodes WAV and writes to SD card. Simultaneously, it passes the audio through to the NAU8325 amplifier for headphone monitoring. An OLED display on I2C shows recording time and VU levels pulled from peak detection on the incoming audio. A handful of GPIO buttons handle record, stop, playback, and mode switching. The whole thing runs on a LiPo, managed by the Glyph S3's built-in charger.
 
-- **Noise gating** — silence the noise floor when nobody's talking
-- **EQ** — boost warmth at 150 Hz, add air at 10 kHz
-- **Compression** — even out level differences
-- **Auto gain control** — adjust input gain on the fly
+That's the core. Everything else — Wi-Fi streaming, DSP effects, web control panel — those are stretch goals. The foundation is solid on its own.
 
-These aren't gimmicks. Applied tastefully, they can close a significant chunk of the quality gap between a MEMS mic and a budget condenser. For podcast and content creation, they can make the difference between "sounds like a DIY project" and "sounds like a real mic."
+## Kit Parts (All from PCB Cupid)
 
-## Rough Architecture
+Glyph S3 at ₹699 handles the brainwork and keeps the battery happy. The G-Sense 2CH MEMS Mic at ₹499 is the microphone itself. A G-Mod Micro SD Card Breakout at ₹99 stores the recordings. The NAU8325 drives headphones for monitoring. A 1.3-inch SH1106 OLED at ₹320 shows you what's going on. The 3D-printed enclosure at ₹199 holds it all together. Toss in a LiPo for a couple hundred rupees, and you're sitting at somewhere between two and two-and-a-half thousand for the whole build.
 
-```
-                    ┌──────────────────────────────────┐
-                    │          Glyph ESP32-S3           │
-                    │  Dual-core 240MHz, 8MB flash      │
-  2CH Mic ──I2S──▶  │  I2S0_RX  ┌──────────┐  I2S0_TX │  ──I2S──▶  NAU8325 ──▶  Headphones
-  (Stereo, 24-bit,  │            │ Audio DSP │          │
-   44.1kHz)         │            │ - WAV enc │          │  ──I2C──▶  SH1106 OLED
-                    │            │ - VU meter│          │           (VU bars, time, battery)
-  SD Card ◀──SPI──▶ │  SPI2      │ - EQ/Dyn  │          │
-  (WAV storage)     │            └──────────┘          │
-                    │                                  │
-  Buttons ──GPIO──▶ │  REC ●  STOP ■  PLAY ▶  MODE    │
-                    │                                  │
-  Battery ──BMS──▶  │  Built-in LiPo charger           │
-                    └──────────────────────────────────┘
-```
+For perspective: a basic stereo field recorder costs eight to ten thousand. A decent wireless mic setup runs fifteen to twenty-five. This kit costs less than a nice dinner for two, and you walk away understanding how digital audio actually works, from the silicon up.
 
-## Kit BOM (Everything from PCB Cupid)
+## What's in This Repo (Eventually)
 
-| Module | Price | What It Does |
-|--------|-------|--------------|
-| Glyph ESP32-S3 | ₹699 | Brain + battery management |
-| G-Sense 2CH MEMS Mic I2S | ₹499 | The microphone itself |
-| NAU8325 Codec+Amp | TBD | Headphone monitoring output |
-| G-Mod Micro SD Card Breakout | ₹99 | WAV file storage |
-| 1.3" SH1106 OLED (I2C) | ₹320 | Status display + VU meter |
-| 3D Printed Enclosure | ₹199 | Housing |
-| LiPo Battery | ~₹200-400 | Portable power |
-| **Total** | **~₹2,000-2,500** | |
+Firmware for the Glyph S3, the RTOS-based audio pipeline, all of it in Arduino. Wiring diagrams and pin mappings. A proper build guide. And once it's all working, demo videos, sample recordings, comparison tests against the expensive stuff.
 
-For context: a basic stereo field recorder costs ₹8,000-10,000. A good wireless mic setup costs ₹15,000-25,000. This kit costs less than a dinner for two at a nice restaurant, and you walk away knowing how digital audio actually works.
+## The Spirit of This
 
-## What's in This Repo
+We're not trying to beat the audio engineering industry at their own game. We're trying to show what's possible when you look at the components sitting on your own workbench and ask the question that started all of this.
 
-This repository will contain:
-- **Firmware** — Arduino sketch for the ESP32-S3 with RTOS-based audio pipeline
-- **Hardware** — Wiring diagrams, pin mappings, enclosure design notes
-- **Documentation** — Build guide, user manual, component reference
-- **Content** — Demo videos, sample recordings, comparison tests
+What if we just built it ourselves?
 
-## The Spirit of This Project
-
-We're not trying to beat the audio engineering industry at their own game. We're trying to show what's possible when you look at the components sitting on your own workbench and ask: *what if we just built it ourselves?*
-
-Sometimes the answer is "it won't be as good." And that's fine. But sometimes the answer is "it'll be 90% as good for 10% of the price, and you'll understand every piece of it." That's the sweet spot. That's where PCB Cupid lives.
+Sometimes the answer is "it won't be as good." And that's fine. But sometimes the answer is "it'll be ninety percent as good for ten percent of the price, and you'll understand every piece of it." That's the sweet spot. That's where PCB Cupid lives.
 
 Let's build a mic.
