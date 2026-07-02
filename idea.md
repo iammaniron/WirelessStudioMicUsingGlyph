@@ -1,6 +1,8 @@
-# The ₹2,000 Studio Mic
+The ₹2,000 Studio Mic
+---
 
-## Where This Came From
+Where This Came From
+---
 
 A few weeks ago, we were filming some content for PCB Cupid's YouTube channel. We had this tiny wireless microphone clipped onto the presenter's collar — one of those expensive ones that every creator swears by. You know the kind. Costs somewhere north of fifteen thousand rupees. Sounds great. Pairs instantly. The whole crew loves it.
 
@@ -14,7 +16,8 @@ We all looked at each other. Then at the pile of Glyph boards on the workbench. 
 
 That's how this started. Not with a datasheet. With a question that wouldn't go away.
 
-## The Bet
+The Bet
+---
 
 Here's the thing about building hardware in India. You're always fighting the perception that the expensive imported thing is better. And sometimes it is. That wireless mic we were using is genuinely good engineering. No argument there.
 
@@ -28,7 +31,8 @@ But here's what we *can* do: build something that costs less than the GST on tha
 
 That's a different kind of value. That's the PCB Cupid kind.
 
-## What We're Actually Building
+What We're Actually Building
+---
 
 A self-contained stereo recording microphone. Portable. Battery powered. All-digital signal path. Made entirely from our own modules.
 
@@ -40,7 +44,8 @@ Audio gets written as proper WAV files to a microSD card over SPI. A tiny OLED s
 
 All of this goes into a 3D-printed enclosure. The whole thing, end to end, costs around two to two-and-a-half thousand rupees in parts. Every single component is something we already sell on shop.pcbcupid.com.
 
-## Why a Kit
+Why a Kit
+---
 
 We want to sell this as a kit. Not a finished product. A kit.
 
@@ -50,7 +55,8 @@ But honestly, the bigger reason is simpler. There's something different about re
 
 And it's hackable by design. Want Wi-Fi streaming? The Glyph has it built in. Want a web interface for settings? Go ahead. Want to add DSP effects? The processor can handle it. The kit is a starting point, not a finished product.
 
-## How It Actually Sounds
+How It Actually Sounds
+---
 
 I want to be straight about this, because overselling helps nobody.
 
@@ -64,23 +70,27 @@ But here's the clever part that makes up for a lot of this. Because the audio is
 
 Applied tastefully, these close a surprising amount of the gap between a MEMS mic and a budget condenser. For podcasting and content creation, they can tip the difference between "sounds like a fun DIY project" and "wait, that actually sounds like a real mic."
 
-## Rough Plan
+Rough Plan
+---
 
 The recording pipeline is straightforward. Mic to Glyph over I2S. Glyph encodes WAV and writes to SD card. Simultaneously, it passes the audio through to the NAU8325 amplifier for headphone monitoring. An OLED display on I2C shows recording time and VU levels pulled from peak detection on the incoming audio. A handful of GPIO buttons handle record, stop, playback, and mode switching. The whole thing runs on a LiPo, managed by the Glyph S3's built-in charger.
 
 That's the core. Everything else — Wi-Fi streaming, DSP effects, web control panel — those are stretch goals. The foundation is solid on its own.
 
-## Kit Parts (All from PCB Cupid)
+Kit Parts (All from PCB Cupid)
+---
 
 Glyph S3 at ₹699 handles the brainwork and keeps the battery happy. The G-Sense 2CH MEMS Mic at ₹499 is the microphone itself. A G-Mod Micro SD Card Breakout at ₹99 stores the recordings. The NAU8325 drives headphones for monitoring. A 1.3-inch SH1106 OLED at ₹320 shows you what's going on. The 3D-printed enclosure at ₹199 holds it all together. Toss in a LiPo for a couple hundred rupees, and you're sitting at somewhere between two and two-and-a-half thousand for the whole build.
 
 For perspective: a basic stereo field recorder costs eight to ten thousand. A decent wireless mic setup runs fifteen to twenty-five. This kit costs less than a nice dinner for two, and you walk away understanding how digital audio actually works, from the silicon up.
 
-## What's in This Repo (Eventually)
+What's in This Repo (Eventually)
+---
 
 Firmware for the Glyph S3, the RTOS-based audio pipeline, all of it in Arduino. Wiring diagrams and pin mappings. A proper build guide. And once it's all working, demo videos, sample recordings, comparison tests against the expensive stuff.
 
-## The Spirit of This
+The Spirit of This
+---
 
 We're not trying to beat the audio engineering industry at their own game. We're trying to show what's possible when you look at the components sitting on your own workbench and ask the question that started all of this.
 
