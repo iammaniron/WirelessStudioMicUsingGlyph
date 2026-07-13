@@ -34,6 +34,11 @@ String currentFileName;
 // ---- File counter for unique names ----
 int fileCounter = 0;
 
+// ---- Button debounce ----
+unsigned long lastBtnCheck = 0;
+bool lastBtnState         = HIGH;  // unpressed (pullup)
+bool btnPressed           = false;
+
 // ============================================================
 // SD CARD
 // ============================================================
@@ -221,6 +226,27 @@ void recordingLoop() {
 
   // Blink LED while recording (on/off every 500ms based on sample count)
   digitalWrite(RECORD_LED, (samplesWritten / (SAMPLE_RATE / 2)) % 2);
+}
+
+// ---- Physical button on GPIO 9 (boot pin usable after startup) ----
+// Short press toggles recording. Debounced at ~30ms.
+void handleButton() {
+  unsigned long now = millis();
+  if (now - lastBtnCheck < 30) return;   // debounce
+  lastBtnCheck = now;
+
+  bool state = digitalRead(RECORD_BTN);
+  if (state == LOW && lastBtnState == HIGH) {
+    // falling edge — button pressed
+    if (isRecording) {
+      stopRecording();
+      Serial.println("[BTN] Recording stopped via button");
+    } else {
+      startRecording();
+      Serial.println("[BTN] Recording started via button");
+    }
+  }
+  lastBtnState = state;
 }
 
 // ============================================================
@@ -530,12 +556,14 @@ void setup() {
   // ---- Web Server ----
   setupWebServer();
 
-  // ---- Onboard LED ----
+  // ---- Onboard LED & Button ----
   pinMode(RECORD_LED, OUTPUT);
   digitalWrite(RECORD_LED, LOW);
+  pinMode(RECORD_BTN, INPUT_PULLUP);   // GPIO 9 — boot pin, safe as input after boot
 
   Serial.println("[READY] Connect to WiFi: \"" AP_SSID "\"");
   Serial.println("[READY] Then open http://" + WiFi.softAPIP().toString());
+  Serial.println("[READY] Or press the button on GPIO 9 to record/stop");
 }
 
 // ============================================================
@@ -545,4 +573,5 @@ void setup() {
 void loop() {
   server.handleClient();
   recordingLoop();
+  handleButton();
 }
