@@ -32,7 +32,7 @@
 // ---- Recording ----
 #define CHUNK_SIZE        4096      // bytes to buffer before SD write
 #define RECORD_LED        14        // onboard LED on C6 (blinks when recording)
-#define RECORD_BTN        9         // user button — short press toggles record/stop
+#define RECORD_BTN        9         // onboard BOOT key (user button after boot)
 
 // ---- Web Server ----
 #define WEB_PORT          80

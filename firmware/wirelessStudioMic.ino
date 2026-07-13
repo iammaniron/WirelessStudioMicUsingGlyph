@@ -228,8 +228,9 @@ void recordingLoop() {
   digitalWrite(RECORD_LED, (samplesWritten / (SAMPLE_RATE / 2)) % 2);
 }
 
-// ---- Physical button on GPIO 9 (boot pin usable after startup) ----
-// Short press toggles recording. Debounced at ~30ms.
+// ---- Onboard BOOT key as record/stop button (GPIO 9) ----
+// After boot, the BOOT pin is free. Short press toggles recording.
+// Debounced at ~30ms. Uses internal pullup — no external wiring needed.
 void handleButton() {
   unsigned long now = millis();
   if (now - lastBtnCheck < 30) return;   // debounce
@@ -559,11 +560,11 @@ void setup() {
   // ---- Onboard LED & Button ----
   pinMode(RECORD_LED, OUTPUT);
   digitalWrite(RECORD_LED, LOW);
-  pinMode(RECORD_BTN, INPUT_PULLUP);   // GPIO 9 — boot pin, safe as input after boot
+  pinMode(RECORD_BTN, INPUT_PULLUP);   // GPIO 9 — onboard BOOT key, acts as user button after boot
 
   Serial.println("[READY] Connect to WiFi: \"" AP_SSID "\"");
   Serial.println("[READY] Then open http://" + WiFi.softAPIP().toString());
-  Serial.println("[READY] Or press the button on GPIO 9 to record/stop");
+  Serial.println("[READY] Or press the onboard BOOT button to record/stop");
 }
 
 // ============================================================
