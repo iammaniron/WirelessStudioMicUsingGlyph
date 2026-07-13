@@ -563,7 +563,7 @@ void setup() {
   pinMode(RECORD_BTN, INPUT_PULLUP);   // GPIO 9 — onboard BOOT key, acts as user button after boot
 
   Serial.println("[READY] Connect to WiFi: \"" AP_SSID "\"");
-  Serial.println("[READY] Then open http://" + WiFi.softAPIP().toString());
+  Serial.println("[READY] Web panel → http://" + WiFi.softAPIP().toString());
   Serial.println("[READY] Or press the onboard BOOT button to record/stop");
 }
 
