@@ -45,7 +45,7 @@ bool btnPressed           = false;
 
 bool initSD() {
   SPI.begin(SD_SCK, SD_MISO, SD_MOSI);
-  if (!SD.begin(SD_CS)) {
+  if (!SD.begin(SD_CS, 20000000)) {   // 20 MHz SPI — default 4 MHz is too slow
     Serial.println("[SD] Card init failed — is the card inserted?");
     return false;
   }
@@ -518,10 +518,29 @@ void setupWebServer() {
     }
 
     size_t fileSize = downloadFile.size();
-    server.sendHeader("Content-Type", "audio/wav");
-    server.sendHeader("Content-Disposition", "attachment; filename=\"" + filename.substring(1) + "\"");
-    server.sendHeader("Content-Length", String(fileSize));
-    server.streamFile(downloadFile, "audio/wav");
+
+    // Manually send HTTP response for reliable fast streaming.
+    // Bypasses server.streamFile() which sends tiny chunks and crawls.
+    WiFiClient client = server.client();
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: audio/wav");
+    client.println("Content-Disposition: attachment; filename=\"" + filename.substring(1) + "\"");
+    client.printf("Content-Length: %d\n", fileSize);
+    client.println("Connection: close");
+    client.println();
+
+    // Stream in 8 KB chunks
+    const size_t CHUNK = 8192;
+    uint8_t buf[CHUNK];
+    size_t remaining = fileSize;
+    while (remaining > 0 && client.connected()) {
+      size_t toRead = (remaining < CHUNK) ? remaining : CHUNK;
+      size_t bytes = downloadFile.read(buf, toRead);
+      if (bytes == 0) break;
+      client.write(buf, bytes);
+      remaining -= bytes;
+    }
+    client.flush();
     downloadFile.close();
   });
 
