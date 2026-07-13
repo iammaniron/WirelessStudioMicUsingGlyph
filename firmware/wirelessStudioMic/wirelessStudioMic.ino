@@ -495,10 +495,15 @@ void setupWebServer() {
 
     String filename = server.arg("file");
 
-    // Security: prevent directory traversal
-    if (filename.indexOf("..") != -1 || !filename.startsWith("/")) {
+    // Security: block directory traversal
+    if (filename.indexOf("..") != -1) {
       server.send(403, "text/plain", "Forbidden");
       return;
+    }
+
+    // SD library works with or without leading slash — normalise it
+    if (!filename.startsWith("/")) {
+      filename = "/" + filename;
     }
 
     if (!SD.exists(filename)) {
