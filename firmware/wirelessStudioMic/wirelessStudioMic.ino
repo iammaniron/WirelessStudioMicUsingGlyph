@@ -586,6 +586,11 @@ void setup() {
   Serial.println("  Glyph C6 + G-Sense 2CH Mic + SD Card");
   Serial.println("══════════════════════════════════════");
 
+  // ---- Watchdog: subscribe this task + bump timeout to 15s ----
+  esp_task_wdt_init(15, false);   // 15 sec timeout, don't panic (just reset)
+  esp_task_wdt_add(NULL);         // subscribe the main loop task
+  esp_task_wdt_reset();
+
   // ---- Reset reason (helpful for debugging) ----
   Serial.print("[BOOT] Reset reason: ");
   switch (esp_reset_reason()) {
