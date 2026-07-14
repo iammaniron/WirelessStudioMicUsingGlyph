@@ -14,6 +14,7 @@
 #include <SD.h>
 #include <SPI.h>
 #include <AudioTools.h>
+#include <esp_task_wdt.h>
 #include "config.h"
 
 // ============================================================
@@ -240,6 +241,9 @@ void recordingLoop() {
 
   // Blink LED while recording (on/off every 500ms based on sample count)
   digitalWrite(RECORD_LED, (samplesWritten / (SAMPLE_RATE / 2)) % 2);
+
+  // Feed the watchdog — I2S + SD + WiFi together can starve the idle task
+  esp_task_wdt_reset();
 }
 
 // ---- Onboard BOOT key as record/stop button (GPIO 9) ----
@@ -543,7 +547,7 @@ void setupWebServer() {
     client.println("Connection: close");
     client.println();
 
-    // Stream in 8 KB chunks
+    // Stream in 8 KB chunks — feed watchdog each chunk
     const size_t CHUNK = 8192;
     uint8_t buf[CHUNK];
     size_t remaining = fileSize;
@@ -553,6 +557,8 @@ void setupWebServer() {
       if (bytes == 0) break;
       client.write(buf, bytes);
       remaining -= bytes;
+      esp_task_wdt_reset();  // long download must not trigger watchdog
+      yield();
     }
     client.flush();
     downloadFile.close();
@@ -579,6 +585,19 @@ void setup() {
   Serial.println("  PCB Cupid — Wireless Studio Mic");
   Serial.println("  Glyph C6 + G-Sense 2CH Mic + SD Card");
   Serial.println("══════════════════════════════════════");
+
+  // ---- Reset reason (helpful for debugging) ----
+  Serial.print("[BOOT] Reset reason: ");
+  switch (esp_reset_reason()) {
+    case ESP_RST_POWERON:  Serial.println("Power-on"); break;
+    case ESP_RST_SW:        Serial.println("Software reset"); break;
+    case ESP_RST_PANIC:     Serial.println("Panic / exception"); break;
+    case ESP_RST_INT_WDT:   Serial.println("Interrupt watchdog"); break;
+    case ESP_RST_TASK_WDT:  Serial.println("Task watchdog — loop blocked too long!"); break;
+    case ESP_RST_WDT:       Serial.println("Other watchdog"); break;
+    case ESP_RST_BROWNOUT:  Serial.println("Brownout — power supply too weak!"); break;
+    default:                Serial.println(esp_reset_reason()); break;
+  }
 
   // ---- SD Card ----
   Serial.print("[INIT] SD Card... ");
@@ -613,4 +632,6 @@ void loop() {
   server.handleClient();
   recordingLoop();
   handleButton();
+  delay(1);          // yield to WiFi stack and other FreeRTOS tasks
+  esp_task_wdt_reset();
 }

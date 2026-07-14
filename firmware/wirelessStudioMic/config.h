@@ -34,7 +34,7 @@
 #define WAV_BITS_PER_SAMPLE  16      // CD-quality WAV, half the size of 24/32-bit
 
 // ---- Recording ----
-#define CHUNK_SIZE        4096       // bytes to read from I2S per iteration
+#define CHUNK_SIZE        2048       // smaller chunks = more frequent WDT feeding
 #define RECORD_LED        14         // onboard LED on C6 (blinks when recording)
 #define RECORD_BTN        9          // onboard BOOT key (user button after boot)
 
