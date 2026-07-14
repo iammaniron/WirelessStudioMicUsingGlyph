@@ -613,6 +613,7 @@ void setup() {
   // ---- WiFi Access Point ----
   Serial.print("[INIT] WiFi AP... ");
   WiFi.softAP(AP_SSID, AP_PASS);
+  WiFi.setTxPower(WIFI_POWER_8_5dBm);   // lower TX power = fewer brownout spikes
   Serial.println(WiFi.softAPIP());
 
   // ---- Web Server ----
