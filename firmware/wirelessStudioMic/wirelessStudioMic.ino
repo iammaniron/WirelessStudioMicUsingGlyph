@@ -541,8 +541,8 @@ void setupWebServer() {
     server.sendHeader("Content-Disposition",
                       "attachment; filename=\"" + filename.substring(1) + "\"");
     server.sendHeader("Content-Length", String(fileSize));
-    server.send(200, "audio/wav", "");              // headers with empty body
-    server.streamFile(downloadFile, "audio/wav");   // library handles chunking safely
+    // streamFile sends headers + body — don't call send() before it
+    server.streamFile(downloadFile, "audio/wav");
     downloadFile.close();
   });
 
