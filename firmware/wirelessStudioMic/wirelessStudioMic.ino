@@ -22,7 +22,9 @@
 
 WebServer server(WEB_PORT);
 
-AudioInfo audioInfo(SAMPLE_RATE, NUM_CHANNELS, BITS_PER_SAMPLE);
+// I2S captures at 32-bit (matches ICS-43434 hardware), WAV stored at 16-bit
+AudioInfo captureInfo(SAMPLE_RATE, NUM_CHANNELS, I2S_BITS_PER_SAMPLE);
+AudioInfo wavInfo(SAMPLE_RATE, NUM_CHANNELS, WAV_BITS_PER_SAMPLE);
 I2SStream i2sStream;
 
 bool isRecording       = false;
@@ -94,7 +96,7 @@ String listRecordingsJSON() {
       // Estimate duration from file size
       size_t dataSize = (f.size() > 44) ? (f.size() - 44) : 0;
       float seconds = (float)dataSize /
-                      (SAMPLE_RATE * NUM_CHANNELS * (BITS_PER_SAMPLE / 8));
+                      (SAMPLE_RATE * NUM_CHANNELS * (WAV_BITS_PER_SAMPLE / 8));
 
       json += "{";
       json += "\"name\":\"" + name + "\",";
@@ -123,7 +125,7 @@ String formatSize(size_t bytes) {
 void writeWavHeader(File &f, uint32_t dataBytes) {
   uint32_t sampleRate    = SAMPLE_RATE;
   uint16_t numChannels   = NUM_CHANNELS;
-  uint16_t bitsPerSample = BITS_PER_SAMPLE;
+  uint16_t bitsPerSample = WAV_BITS_PER_SAMPLE;
   uint16_t bytesPerSample = bitsPerSample / 8;
   uint32_t byteRate      = sampleRate * numChannels * bytesPerSample;
   uint16_t blockAlign    = numChannels * bytesPerSample;
@@ -164,9 +166,9 @@ bool startRecording() {
   // Placeholder header — will be re-written on stop
   writeWavHeader(currentFile, 0);
 
-  // Configure I2S for capture
+  // Configure I2S for capture at 32-bit (matches ICS-43434)
   auto cfg = i2sStream.defaultConfig(RX_MODE);
-  cfg.copyFrom(audioInfo);
+  cfg.copyFrom(captureInfo);
   cfg.i2s_format   = I2S_STD_FORMAT;
   cfg.pin_ws       = I2S_WS;
   cfg.pin_bck      = I2S_SCK;
@@ -198,7 +200,7 @@ void stopRecording() {
   i2sStream.end();
 
   // Calculate actual data size and re-write header
-  uint32_t dataBytes = samplesWritten * NUM_CHANNELS * (BITS_PER_SAMPLE / 8);
+  uint32_t dataBytes = samplesWritten * (WAV_BITS_PER_SAMPLE / 8);
   currentFile.seek(0);
   writeWavHeader(currentFile, dataBytes);
   currentFile.close();
@@ -212,16 +214,28 @@ void stopRecording() {
   isRecording = false;
 }
 
-// Called every loop iteration — drains I2S DMA buffer into SD card
+// Called every loop iteration — drains I2S DMA buffer into SD card.
+// Captures at 32-bit (what the ICS-43434 sends) and converts to 16-bit WAV.
 void recordingLoop() {
   if (!isRecording) return;
 
-  static uint8_t buffer[CHUNK_SIZE];
-  size_t bytesRead = i2sStream.readBytes(buffer, CHUNK_SIZE);
+  // Read 32-bit samples from I2S
+  static int32_t rawBuf[CHUNK_SIZE / 4];  // 1024 samples
+  size_t bytesRead = i2sStream.readBytes((uint8_t*)rawBuf, CHUNK_SIZE);
 
   if (bytesRead > 0) {
-    currentFile.write(buffer, bytesRead);
-    samplesWritten += bytesRead / (NUM_CHANNELS * (BITS_PER_SAMPLE / 8));
+    int numSamples = bytesRead / 4;  // 32-bit = 4 bytes per sample
+
+    // Convert 32-bit → 16-bit: the ICS-43434 puts 24-bit audio in the top
+    // of a 32-bit I2S slot. Shifting right by 16 grabs the meaningful 16 bits.
+    static int16_t wavBuf[CHUNK_SIZE / 2];
+    for (int i = 0; i < numSamples; i++) {
+      wavBuf[i] = (int16_t)(rawBuf[i] >> 16);
+    }
+
+    size_t wavBytes = numSamples * 2;  // 16-bit = 2 bytes per sample
+    currentFile.write((uint8_t*)wavBuf, wavBytes);
+    samplesWritten += numSamples;
   }
 
   // Blink LED while recording (on/off every 500ms based on sample count)
