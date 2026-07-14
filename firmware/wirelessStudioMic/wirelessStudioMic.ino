@@ -537,30 +537,12 @@ void setupWebServer() {
 
     size_t fileSize = downloadFile.size();
 
-    // Manually send HTTP response for reliable fast streaming.
-    // Bypasses server.streamFile() which sends tiny chunks and crawls.
-    WiFiClient client = server.client();
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: audio/wav");
-    client.println("Content-Disposition: attachment; filename=\"" + filename.substring(1) + "\"");
-    client.printf("Content-Length: %d\n", fileSize);
-    client.println("Connection: close");
-    client.println();
-
-    // Stream in 8 KB chunks — feed watchdog each chunk
-    const size_t CHUNK = 8192;
-    uint8_t buf[CHUNK];
-    size_t remaining = fileSize;
-    while (remaining > 0 && client.connected()) {
-      size_t toRead = (remaining < CHUNK) ? remaining : CHUNK;
-      size_t bytes = downloadFile.read(buf, toRead);
-      if (bytes == 0) break;
-      client.write(buf, bytes);
-      remaining -= bytes;
-      esp_task_wdt_reset();  // long download must not trigger watchdog
-      yield();
-    }
-    client.flush();
+    server.sendHeader("Content-Type", "audio/wav");
+    server.sendHeader("Content-Disposition",
+                      "attachment; filename=\"" + filename.substring(1) + "\"");
+    server.sendHeader("Content-Length", String(fileSize));
+    server.send(200, "audio/wav", "");              // headers with empty body
+    server.streamFile(downloadFile, "audio/wav");   // library handles chunking safely
     downloadFile.close();
   });
 
