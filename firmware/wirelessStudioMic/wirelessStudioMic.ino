@@ -47,7 +47,7 @@ bool btnPressed           = false;
 
 bool initSD() {
   SPI.begin(SD_SCK, SD_MISO, SD_MOSI);
-  if (!SD.begin(SD_CS, 20000000)) {   // 20 MHz SPI — default 4 MHz is too slow
+  if (!SD.begin(SD_CS, SPI, 20000000)) {   // csPin, spiInstance, 20 MHz
     Serial.println("[SD] Card init failed — is the card inserted?");
     return false;
   }
