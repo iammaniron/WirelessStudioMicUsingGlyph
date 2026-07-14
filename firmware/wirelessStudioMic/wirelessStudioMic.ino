@@ -590,6 +590,9 @@ void setup() {
   esp_task_wdt_add(NULL);
   esp_task_wdt_reset();
 
+  // ---- Memory ----
+  Serial.printf("[BOOT] Free heap: %d KB\n", ESP.getFreeHeap() / 1024);
+
   // ---- Reset reason (helpful for debugging) ----
   Serial.print("[BOOT] Reset reason: ");
   switch (esp_reset_reason()) {
