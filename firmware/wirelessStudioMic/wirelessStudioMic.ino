@@ -537,12 +537,29 @@ void setupWebServer() {
 
     size_t fileSize = downloadFile.size();
 
-    server.sendHeader("Content-Type", "audio/wav");
-    server.sendHeader("Content-Disposition",
-                      "attachment; filename=\"" + filename.substring(1) + "\"");
-    server.sendHeader("Content-Length", String(fileSize));
-    // streamFile sends headers + body — don't call send() before it
-    server.streamFile(downloadFile, "audio/wav");
+    // Manual HTTP response — avoids streamFile() which blocks watchdog.
+    // Small buffer on heap (not stack) prevents crash.
+    WiFiClient client = server.client();
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: audio/wav");
+    client.println("Content-Disposition: attachment; filename=\"" + filename.substring(1) + "\"");
+    client.printf("Content-Length: %d\n", fileSize);
+    client.println("Connection: close");
+    client.println();
+
+    // Stream in small chunks, feed watchdog every iteration
+    size_t remaining = fileSize;
+    uint8_t smallBuf[1024];
+    while (remaining > 0 && client.connected()) {
+      size_t toRead = (remaining > 1024) ? 1024 : remaining;
+      size_t bytes = downloadFile.read(smallBuf, toRead);
+      if (bytes == 0) break;
+      client.write(smallBuf, bytes);
+      remaining -= bytes;
+      esp_task_wdt_reset();
+      yield();
+    }
+    client.flush();
     downloadFile.close();
   });
 
